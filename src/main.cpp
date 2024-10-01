@@ -2,7 +2,7 @@
  * UnTref 2024
  * Diseño y Arquitectura de Sistemas de Computación
  *
- * Proyecto: FarmBot
+ * Proyecto: Rover
  * Integrantes:
  *  -Balmelli Pérez Mateo 
  *  -Di Leo, Tomás
@@ -14,50 +14,58 @@
  */
 
 #include <Arduino.h>
-#include "Motor.h"
+#include "Rover.h"
 
-Motor motor;
+#define DERECHA_A 12
+#define DERECHA_B 14
+#define DERECHA_PWM 13
+#define IZQUIERDA_A 26
+#define IZQUIERDA_B 27
+#define IZQUIERDA_PWM 25
+
+// Crear instancia del Rover
+Rover rover(DERECHA_A, DERECHA_B, DERECHA_PWM, IZQUIERDA_A, IZQUIERDA_B, IZQUIERDA_PWM);
 
 void setup()
 {
     Serial.begin(115200);
 
-    motor.inicializar();
+    rover.inicializar();
     delay(3000);  // Espera de 3 segundos
     
     //criterio de aceptacion 1
-    motor.avanzar();
+    rover.avanzar(200);
     delay(5000);
-    motor.parar();
+    rover.parar();
 
     delay(5000);
 
     //criterio de aceptacion 2
-    motor.retroceder();
+    rover.retroceder(200);
     delay(5000);
-    motor.parar();
+    rover.parar();
 
     delay(5000);
 
     //criterio de aceptacion 3
-    motor.avanzar();
+    rover.avanzar(200);
     delay(5000);
-    motor.parar();
+    rover.parar();
     delay(500);
-    motor.retroceder();
+    rover.retroceder(200);
     delay(5000);
-    motor.parar();
+    rover.parar();
 
     delay(5000);
 
     //criterio de aceptacion 4
-    motor.retroceder();
+    rover.retroceder(200);
     delay(5000);
-    motor.parar();
+    rover.parar();
     delay(500);
-    motor.avanzar();
+    rover.avanzar(200);
     delay(5000);
-    motor.parar();
+    rover.parar();
 }
 
 void loop()

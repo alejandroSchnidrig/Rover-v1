@@ -1,12 +1,11 @@
-#include "Ruedas.h" 
+#include "Motor.h"
 
-class Motor {
+class Rover {
 private:
-    Ruedas ruedasDerecha;
-    Ruedas ruedasIzquierda;
+    Motor motor;
 
 public:
-    Motor(int pinDerechaA, int pinDerechaB, int pinDerechaPWM, 
+    Rover(int pinDerechaA, int pinDerechaB, int pinDerechaPWM, 
           int pinIzquierdaA, int pinIzquierdaB, int pinIzquierdaPWM);
 
     void inicializar();
