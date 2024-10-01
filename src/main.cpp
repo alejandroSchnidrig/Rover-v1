@@ -66,6 +66,21 @@ void setup()
     rover.avanzar(200);
     delay(5000);
     rover.parar();
+
+    //requerimiento N°2
+    //criterio de aceptacion 1
+    rover.girarALaDerecha(255);
+    delay(2000);
+    rover.avanzar(200);
+    delay(3000);
+    rover.parar();
+
+    //criterio de aceptacion 2
+    rover.girarALaIzquierda(255);
+    delay(2000);
+    rover.avanzar(200);
+    delay(3000);
+    rover.parar();
 }
 
 void loop()

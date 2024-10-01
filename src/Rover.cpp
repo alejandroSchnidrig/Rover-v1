@@ -17,6 +17,14 @@
         motor.retroceder(velocidad);
     }
 
+    void Rover::girarALaDerecha(int velocidad){
+        motor.girarALaDerecha(velocidad);
+    }
+
+    void Rover::girarALaIzquierda(int velocidad){
+        motor.girarALaIzquierda(velocidad);
+    }
+
     void Rover::parar(){
         motor.parar();
     }

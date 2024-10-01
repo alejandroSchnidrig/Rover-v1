@@ -12,5 +12,7 @@ public:
     void inicializar();
     void avanzar(int velocidad);
     void retroceder(int velocidad);
+    void girarALaDerecha(int velocidad);
+    void girarALaIzquierda(int velocidad);
     void parar();
 };

@@ -25,6 +25,18 @@
         analogWrite(pinPWM, velocidad);
     }
 
+    void Ruedas::girarALaDerecha(int velocidad) {
+        digitalWrite(pinA, LOW);
+        digitalWrite(pinB, HIGH);
+        analogWrite(pinPWM, velocidad);
+    }
+
+    void Ruedas::girarALaIzquierda(int velocidad) {
+        digitalWrite(pinA, HIGH);
+        digitalWrite(pinB, LOW);
+        analogWrite(pinPWM, velocidad);
+    }
+
     void Ruedas::detener(){
         digitalWrite(pinA, LOW);
         digitalWrite(pinB, LOW);

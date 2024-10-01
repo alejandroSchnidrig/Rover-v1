@@ -20,6 +20,16 @@
         ruedasIzquierda.moverAtras(velocidad);
     }
 
+    void Motor::girarALaDerecha(int velocidad){
+        ruedasDerecha.girarALaDerecha(velocidad);
+        ruedasIzquierda.girarALaIzquierda(velocidad);
+    }
+
+    void Motor::girarALaIzquierda(int velocidad){
+        ruedasDerecha.girarALaIzquierda(velocidad);
+        ruedasIzquierda.girarALaDerecha(velocidad);
+    }
+
     void Motor::parar(){
         ruedasDerecha.detener();
         ruedasIzquierda.detener();
