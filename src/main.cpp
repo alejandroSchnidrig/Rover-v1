@@ -15,6 +15,7 @@
 
 #include <Arduino.h>
 #include "Rover.h"
+#include "ConexionWifi.h"
 
 #define DERECHA_A 12
 #define DERECHA_B 14
@@ -23,12 +24,24 @@
 #define IZQUIERDA_B 27
 #define IZQUIERDA_PWM 25
 
+// credenciales al la re wifi, modificar segun corresponda
+const char* ssid = "SSID";
+const char* password = "Password";
+
+ConexionWifi wifi(ssid, password);
+
 // Crear instancia del Rover
 Rover rover(DERECHA_A, DERECHA_B, DERECHA_PWM, IZQUIERDA_A, IZQUIERDA_B, IZQUIERDA_PWM);
 
 void setup()
 {
     Serial.begin(115200);
+
+    //pruebas conexion wifi
+    wifi.conectar();
+    wifi.estaConectado();
+    delay(5000);
+    wifi.desconectar();
 
     rover.inicializar();
     delay(3000);  // Espera de 3 segundos
