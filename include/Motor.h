@@ -1,3 +1,6 @@
+#ifndef MOTOR_H
+#define MOTOR_H
+
 #include "Ruedas.h" 
 
 class Motor {
@@ -16,3 +19,5 @@ public:
     void girarALaIzquierda(int velocidad);
     void parar();
 };
+
+#endif

@@ -1,3 +1,6 @@
+#ifndef ROVER_H
+#define ROVER_H
+
 #include "Motor.h"
 
 class Rover {
@@ -15,3 +18,5 @@ public:
     void girarALaIzquierda(int velocidad);
     void parar();
 };
+
+#endif

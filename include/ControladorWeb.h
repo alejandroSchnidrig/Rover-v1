@@ -1,3 +1,6 @@
+#ifndef CONTROLADORWEB_H
+#define CONTROLADORWEB_H
+
 #include <WiFi.h>
 
 class ControladorWeb {
@@ -5,3 +8,5 @@ class ControladorWeb {
         ControladorWeb();
         String getWebApp();
 };
+
+#endif

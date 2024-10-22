@@ -1,3 +1,6 @@
+#ifndef RUEDAS_H
+#define RUEDAS_H
+
 class Ruedas {
 private:
     int pinA;
@@ -14,3 +17,5 @@ public:
     void girarALaIzquierda(int velocidad);
     void detener();
 };
+
+#endif
