@@ -5,7 +5,7 @@ RoverControl::RoverControl(int port, Rover* rover, ControladorWeb& controladorWe
 void RoverControl::startServer(){
    
     server.on("/", [this]() {
-        server.send(200, "text/plain", controladorWeb.getWebApp());
+        server.send(200, "text/html", controladorWeb.getWebApp());
     });
 
     server.on("/AVANZAR", [this]() {
