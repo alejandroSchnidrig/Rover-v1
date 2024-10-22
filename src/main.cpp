@@ -16,6 +16,8 @@
 #include <Arduino.h>
 #include "Rover.h"
 #include "ConexionWifi.h"
+#include "ControladorWeb.h"
+#include "RoverControl.h"
 
 #define DERECHA_A 12
 #define DERECHA_B 14
@@ -29,9 +31,9 @@ const char* ssid = "WIFI_ROVER";
 const char* password = "123456789";
 
 ConexionWifi wifi(ssid, password);
-
-// Crear instancia del Rover
 Rover rover(DERECHA_A, DERECHA_B, DERECHA_PWM, IZQUIERDA_A, IZQUIERDA_B, IZQUIERDA_PWM);
+ControladorWeb controladorWeb;
+RoverControl roverControl(80, &rover, controladorWeb);
 
 void setup()
 {
@@ -40,10 +42,11 @@ void setup()
     wifi.crearRed();
 
     rover.inicializar();
-    delay(3000);  // Espera de 3 segundos
+   
+    roverControl.startServer();
     
     //criterio de aceptacion 1
-    rover.avanzar(200);
+    /*rover.avanzar(200);
     delay(5000);
     rover.parar();
 
@@ -89,10 +92,9 @@ void setup()
     delay(2000);
     rover.avanzar(200);
     delay(3000);
-    rover.parar();
+    rover.parar();*/
 }
 
-void loop()
-{
-   Serial.println("Rover en funcionamiento");
+void loop(){
+   roverControl.handleClient();
 }
