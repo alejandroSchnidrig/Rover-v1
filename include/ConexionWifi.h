@@ -2,13 +2,10 @@
 
 class ConexionWifi {
   private:
-    const char* ssid;     
+    const char* ssid;
     const char* password;
 
   public:
     ConexionWifi(const char* ssid, const char* password);
-    
-    void conectar();
-    bool estaConectado();
-    void desconectar();
+    void crearRed();
 };

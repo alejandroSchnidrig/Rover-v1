@@ -24,9 +24,9 @@
 #define IZQUIERDA_B 27
 #define IZQUIERDA_PWM 25
 
-// credenciales al la re wifi, modificar segun corresponda
-const char* ssid = "SSID";
-const char* password = "Password";
+// credenciales a la re wifi
+const char* ssid = "WIFI_ROVER";
+const char* password = "123456789";
 
 ConexionWifi wifi(ssid, password);
 
@@ -37,11 +37,7 @@ void setup()
 {
     Serial.begin(115200);
 
-    //pruebas conexion wifi
-    wifi.conectar();
-    wifi.estaConectado();
-    delay(5000);
-    wifi.desconectar();
+    wifi.crearRed();
 
     rover.inicializar();
     delay(3000);  // Espera de 3 segundos
