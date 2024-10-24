@@ -18,6 +18,7 @@
 #include "ConexionWifi.h"
 #include "ControladorWeb.h"
 #include "RoverControl.h"
+#include <NewPing.h>
 
 #define DERECHA_A 12
 #define DERECHA_B 14
@@ -26,17 +27,47 @@
 #define IZQUIERDA_B 27
 #define IZQUIERDA_PWM 25
 
+// sensor
+#define TRIG_PIN_1 34  
+#define ECHO_PIN_1 5
+#define TRIG_PIN_2 33 
+#define ECHO_PIN_2 6    
+#define MAX_DISTANCIA_SENSOR 50 //(50 cm)
+#define DISTANCIA_OBSTACULO 20  //(20cm)
+
+NewPing sensor1(TRIG_PIN_1, ECHO_PIN_1, MAX_DISTANCIA_SENSOR);
+NewPing sensor2(TRIG_PIN_2, ECHO_PIN_2, MAX_DISTANCIA_SENSOR);
+
 // credenciales a la re wifi
 const char* ssid = "WIFI_ROVER";
 const char* password = "123456789";
 
+TaskHandle_t TaskSensores;
 ConexionWifi wifi(ssid, password);
 Rover rover(DERECHA_A, DERECHA_B, DERECHA_PWM, IZQUIERDA_A, IZQUIERDA_B, IZQUIERDA_PWM);
 ControladorWeb controladorWeb;
 RoverControl roverControl(80, &rover, controladorWeb);
 
-void setup()
-{
+void loopSensores(void *parameter){
+
+    for (;;){
+       
+        unsigned int distancia1 = sensor1.ping_cm();
+        unsigned int distancia2 = sensor2.ping_cm();
+        
+        if ((distancia1 > 0 && distancia1 <= DISTANCIA_OBSTACULO) || 
+            (distancia2 > 0 && distancia2 <= DISTANCIA_OBSTACULO)) {
+                rover.parar();
+        }
+
+        vTaskDelay(50 / portTICK_PERIOD_MS);
+    }
+}
+
+void setup(){
+
+    xTaskCreatePinnedToCore(loopSensores, "TaskSensores", 8000, NULL, 1, &TaskSensores, 0);
+    
     Serial.begin(115200);
 
     wifi.crearRed();
@@ -44,55 +75,7 @@ void setup()
     rover.inicializar();
    
     roverControl.startServer();
-    
-    //criterio de aceptacion 1
-    /*rover.avanzar(200);
-    delay(5000);
-    rover.parar();
 
-    delay(5000);
-
-    //criterio de aceptacion 2
-    rover.retroceder(200);
-    delay(5000);
-    rover.parar();
-
-    delay(5000);
-
-    //criterio de aceptacion 3
-    rover.avanzar(200);
-    delay(5000);
-    rover.parar();
-    delay(500);
-    rover.retroceder(200);
-    delay(5000);
-    rover.parar();
-
-    delay(5000);
-
-    //criterio de aceptacion 4
-    rover.retroceder(200);
-    delay(5000);
-    rover.parar();
-    delay(500);
-    rover.avanzar(200);
-    delay(5000);
-    rover.parar();
-
-    //requerimiento N°2
-    //criterio de aceptacion 1
-    rover.girarALaDerecha(255);
-    delay(2000);
-    rover.avanzar(200);
-    delay(3000);
-    rover.parar();
-
-    //criterio de aceptacion 2
-    rover.girarALaIzquierda(255);
-    delay(2000);
-    rover.avanzar(200);
-    delay(3000);
-    rover.parar();*/
 }
 
 void loop(){
