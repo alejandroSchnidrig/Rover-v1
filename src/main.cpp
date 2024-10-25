@@ -36,8 +36,8 @@
 
 #define BUZZER 4
 
-#define MAX_DISTANCIA_SENSOR 80 //(80 cm)
-#define DISTANCIA_OBSTACULO 30  //(30cm)
+#define MAX_DISTANCIA_SENSOR 60 //(80 cm)
+#define DISTANCIA_OBSTACULO 35  //(30cm)
 
 NewPing sensor1(TRIG_PIN_1, ECHO_PIN_1, MAX_DISTANCIA_SENSOR);
 NewPing sensor2(TRIG_PIN_2, ECHO_PIN_2, MAX_DISTANCIA_SENSOR);
@@ -54,17 +54,32 @@ RoverControl roverControl(80, &rover, controladorWeb);
 
 void loopSensores(void *parameter){
 
+    bool obstaculoDetectado = false;
+
     for (;;){
        
+
         unsigned int distancia1 = sensor1.ping_cm();
         unsigned int distancia2 = sensor2.ping_cm();
 
-        bool obstaculoDetectado = false;
+        Serial.print("Sensor 1 : ");
+        Serial.println(distancia1);
+        Serial.print("Sensor 2 : ");
+        Serial.println(distancia2);
+        Serial.println(" ");
+
+        if(distancia1 > 5 && distancia1 <= DISTANCIA_OBSTACULO){
+            distancia1 = sensor1.ping_cm();
+        }
+
+        if(distancia2 > 5 && distancia1 <= DISTANCIA_OBSTACULO){
+            distancia2 = sensor2.ping_cm();
+        }
         
-        if ((distancia1 > 0 && distancia1 <= DISTANCIA_OBSTACULO) || 
-            (distancia2 > 0 && distancia2 <= DISTANCIA_OBSTACULO)) {
+        if ((distancia1 > 5 && distancia1 <= DISTANCIA_OBSTACULO) || 
+            (distancia2 > 5 && distancia2 <= DISTANCIA_OBSTACULO)) {
             rover.parar();
-            if(!obstaculoDetectado){
+            if(obstaculoDetectado == false){
                 obstaculoDetectado = true;
                 for(int i = 0; i < 3; i++){
                     digitalWrite(BUZZER, HIGH);
