@@ -30,8 +30,12 @@
 // sensor
 #define TRIG_PIN_1 5
 #define ECHO_PIN_1 34
-#define TRIG_PIN_2 33 
-#define ECHO_PIN_2 10    
+
+#define TRIG_PIN_2 18
+#define ECHO_PIN_2 39
+
+#define BUZZER 4
+
 #define MAX_DISTANCIA_SENSOR 80 //(80 cm)
 #define DISTANCIA_OBSTACULO 30  //(30cm)
 
@@ -54,10 +58,23 @@ void loopSensores(void *parameter){
        
         unsigned int distancia1 = sensor1.ping_cm();
         unsigned int distancia2 = sensor2.ping_cm();
+
+        bool obstaculoDetectado = false;
         
         if ((distancia1 > 0 && distancia1 <= DISTANCIA_OBSTACULO) || 
             (distancia2 > 0 && distancia2 <= DISTANCIA_OBSTACULO)) {
-                rover.parar();
+            rover.parar();
+            if(!obstaculoDetectado){
+                obstaculoDetectado = true;
+                for(int i = 0; i < 3; i++){
+                    digitalWrite(BUZZER, HIGH);
+                    delay(50);
+                    digitalWrite(BUZZER, LOW);
+                    delay(50);
+                }
+            }
+        }else{
+            obstaculoDetectado = false;
         }
 
         vTaskDelay(50 / portTICK_PERIOD_MS);
@@ -69,6 +86,8 @@ void setup(){
     xTaskCreatePinnedToCore(loopSensores, "TaskSensores", 10000, NULL, 1, &TaskSensores, 0);
     
     Serial.begin(115200);
+
+    pinMode(BUZZER, OUTPUT);
 
     wifi.crearRed();
 
