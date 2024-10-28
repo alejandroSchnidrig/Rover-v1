@@ -36,8 +36,8 @@
 
 #define BUZZER 4
 
-#define MAX_DISTANCIA_SENSOR 60 //(80 cm)
-#define DISTANCIA_OBSTACULO 35  //(30cm)
+#define MAX_DISTANCIA_SENSOR 60 //(60 cm)
+#define DISTANCIA_OBSTACULO 35  //(35cm)
 
 NewPing sensor1(TRIG_PIN_1, ECHO_PIN_1, MAX_DISTANCIA_SENSOR);
 NewPing sensor2(TRIG_PIN_2, ECHO_PIN_2, MAX_DISTANCIA_SENSOR);
@@ -78,6 +78,11 @@ void loopSensores(void *parameter){
         
         if ((distancia1 > 5 && distancia1 <= DISTANCIA_OBSTACULO) || 
             (distancia2 > 5 && distancia2 <= DISTANCIA_OBSTACULO)) {
+            rover.parar();
+            rover.retroceder(255);
+            vTaskDelay(300/ portTICK_PERIOD_MS);
+            rover.girarALaDerecha(200);
+            vTaskDelay(300 / portTICK_PERIOD_MS);
             rover.parar();
             if(obstaculoDetectado == false){
                 obstaculoDetectado = true;
