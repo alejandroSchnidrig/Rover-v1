@@ -14,104 +14,27 @@
  */
 
 #include <Arduino.h>
-#include "Rover.h"
-#include "ConexionWifi.h"
-#include "ControladorWeb.h"
-#include "RoverControl.h"
-#include <NewPing.h>
+#include "Tasks/control_handler.h"
+#include "Tasks/sensor_task.h"
 
-#define DERECHA_A 12
-#define DERECHA_B 14
-#define DERECHA_PWM 13
-#define IZQUIERDA_A 26
-#define IZQUIERDA_B 27
-#define IZQUIERDA_PWM 25
+QueueHandle_t colaDeSensor;
 
-// sensor
-#define TRIG_PIN_1 5
-#define ECHO_PIN_1 34
-
-#define TRIG_PIN_2 18
-#define ECHO_PIN_2 39
-
-#define BUZZER 4
-
-#define MAX_DISTANCIA_SENSOR 60 //(80 cm)
-#define DISTANCIA_OBSTACULO 35  //(30cm)
-
-NewPing sensor1(TRIG_PIN_1, ECHO_PIN_1, MAX_DISTANCIA_SENSOR);
-NewPing sensor2(TRIG_PIN_2, ECHO_PIN_2, MAX_DISTANCIA_SENSOR);
-
-// credenciales a la re wifi
-const char* ssid = "WIFI_ROVER";
-const char* password = "123456789";
-
-TaskHandle_t TaskSensores;
-ConexionWifi wifi(ssid, password);
-Rover rover(DERECHA_A, DERECHA_B, DERECHA_PWM, IZQUIERDA_A, IZQUIERDA_B, IZQUIERDA_PWM);
-ControladorWeb controladorWeb;
-RoverControl roverControl(80, &rover, controladorWeb);
-
-void loopSensores(void *parameter){
-
-    bool obstaculoDetectado = false;
-
-    for (;;){
-       
-
-        unsigned int distancia1 = sensor1.ping_cm();
-        unsigned int distancia2 = sensor2.ping_cm();
-
-        Serial.print("Sensor 1 : ");
-        Serial.println(distancia1);
-        Serial.print("Sensor 2 : ");
-        Serial.println(distancia2);
-        Serial.println(" ");
-
-        if(distancia1 > 5 && distancia1 <= DISTANCIA_OBSTACULO){
-            distancia1 = sensor1.ping_cm();
-        }
-
-        if(distancia2 > 5 && distancia1 <= DISTANCIA_OBSTACULO){
-            distancia2 = sensor2.ping_cm();
-        }
-        
-        if ((distancia1 > 5 && distancia1 <= DISTANCIA_OBSTACULO) || 
-            (distancia2 > 5 && distancia2 <= DISTANCIA_OBSTACULO)) {
-            rover.parar();
-            if(obstaculoDetectado == false){
-                obstaculoDetectado = true;
-                for(int i = 0; i < 3; i++){
-                    digitalWrite(BUZZER, HIGH);
-                    delay(50);
-                    digitalWrite(BUZZER, LOW);
-                    delay(50);
-                }
-            }
-        }else{
-            obstaculoDetectado = false;
-        }
-
-        vTaskDelay(50 / portTICK_PERIOD_MS);
-    }
-}
-
-void setup(){
-
-    xTaskCreatePinnedToCore(loopSensores, "TaskSensores", 10000, NULL, 1, &TaskSensores, 0);
-    
+void setup() {
     Serial.begin(115200);
 
-    pinMode(BUZZER, OUTPUT);
+    // Cola de 5 numeros enteros
+    colaDeSensor = xQueueCreate(5, sizeof(int));
 
-    wifi.crearRed();
+    if (colaDeSensor == NULL) {
+        Serial.println("Fallo en la creacion de la cola");
+        while (1);  // Parar
+    }
 
-    rover.inicializar();
-   
-    roverControl.startServer();
-
+    xTaskCreatePinnedToCore(sensorTask, "Sensor Task", 2048, (void *)colaDeSensor, 1, NULL, 0);
+    xTaskCreatePinnedToCore(controlTask, "Motor Task", 4096, (void *)colaDeSensor, 1, NULL, 1);
 }
 
-void loop(){
-   roverControl.handleClient();
+void loop() {
+    // FreeRTOS
 }
+
