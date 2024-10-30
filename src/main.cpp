@@ -46,7 +46,9 @@ NewPing sensor2(TRIG_PIN_2, ECHO_PIN_2, MAX_DISTANCIA_SENSOR);
 const char* ssid = "WIFI_ROVER";
 const char* password = "123456789";
 
-TaskHandle_t TaskSensores;
+TaskHandle_t TaskSensores, TaskControl;
+QueueHandle_t colaDeSensor;
+
 ConexionWifi wifi(ssid, password);
 Rover rover(DERECHA_A, DERECHA_B, DERECHA_PWM, IZQUIERDA_A, IZQUIERDA_B, IZQUIERDA_PWM);
 ControladorWeb controladorWeb;
@@ -54,69 +56,50 @@ RoverControl roverControl(80, &rover, controladorWeb);
 
 void loopSensores(void *parameter){
 
-    bool obstaculoDetectado = false;
+    int obstaculoDetectado = 0;
 
     for (;;){
-       
-
         unsigned int distancia1 = sensor1.ping_cm();
         unsigned int distancia2 = sensor2.ping_cm();
+        obstaculoDetectado = (distancia1 <= DISTANCIA_OBSTACULO || distancia2 <= DISTANCIA_OBSTACULO) ? 1 : 0;
 
-        Serial.print("Sensor 1 : ");
-        Serial.println(distancia1);
-        Serial.print("Sensor 2 : ");
-        Serial.println(distancia2);
-        Serial.println(" ");
+        xQueueSend(colaDeSensor, &obstaculoDetectado, portMAX_DELAY);
+        vTaskDelay(100 / portTICK_PERIOD_MS);
+    }
+}
 
-        if(distancia1 > 5 && distancia1 <= DISTANCIA_OBSTACULO){
-            distancia1 = sensor1.ping_cm();
-        }
+void loopControl(void *parameter){
+    int obstaculoDetectado;
 
-        if(distancia2 > 5 && distancia1 <= DISTANCIA_OBSTACULO){
-            distancia2 = sensor2.ping_cm();
-        }
-        
-        if ((distancia1 > 5 && distancia1 <= DISTANCIA_OBSTACULO) || 
-            (distancia2 > 5 && distancia2 <= DISTANCIA_OBSTACULO)) {
-            rover.parar();
-            rover.retroceder(255);
-            vTaskDelay(300/ portTICK_PERIOD_MS);
-            rover.girarALaDerecha(200);
-            vTaskDelay(300 / portTICK_PERIOD_MS);
-            rover.parar();
-            if(obstaculoDetectado == false){
-                obstaculoDetectado = true;
-                for(int i = 0; i < 3; i++){
-                    digitalWrite(BUZZER, HIGH);
-                    delay(50);
-                    digitalWrite(BUZZER, LOW);
-                    delay(50);
-                }
+    for (;;){
+        if (xQueueReceive(colaDeSensor, &obstaculoDetectado, portMAX_DELAY)){
+            if (obstaculoDetectado){
+                rover.parar();
+                rover.retroceder(255);
+                vTaskDelay(300 / portTICK_PERIOD_MS);
+                rover.girarALaDerecha(200);
+                vTaskDelay(300 / portTICK_PERIOD_MS);
+                rover.parar();
+            } else {
+                roverControl.handleClient();
             }
-        }else{
-            obstaculoDetectado = false;
         }
-
-        vTaskDelay(50 / portTICK_PERIOD_MS);
     }
 }
 
 void setup(){
 
+    colaDeSensor = xQueueCreate(5, sizeof(int));
+
+    if (colaDeSensor == NULL) {
+        Serial.println("Fallo en la creación de la cola");
+        while (1);
+    }
+
     xTaskCreatePinnedToCore(loopSensores, "TaskSensores", 10000, NULL, 1, &TaskSensores, 0);
-    
-    Serial.begin(115200);
-
-    pinMode(BUZZER, OUTPUT);
-
-    wifi.crearRed();
-
-    rover.inicializar();
-   
-    roverControl.startServer();
-
+    xTaskCreatePinnedToCore(loopControl, "TaskControl", 4096, NULL, 1, &TaskControl, 1);
 }
 
 void loop(){
-   roverControl.handleClient();
+   //roverControl.handleClient();
 }
