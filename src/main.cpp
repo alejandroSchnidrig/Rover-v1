@@ -88,6 +88,11 @@ void loopControl(void *parameter){
 }
 
 void setup(){
+    Serial.begin(115200);
+    pinMode(BUZZER, OUTPUT);
+    wifi.crearRed();
+    rover.inicializar();
+    roverControl.startServer();
 
     colaDeSensor = xQueueCreate(5, sizeof(int));
 
