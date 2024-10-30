@@ -3,58 +3,48 @@
 #include "sensor_task.h"
 
 // sensor
-#define TRIG_PIN_1 5
-#define ECHO_PIN_1 34
+#define TRIG_PIN_IZQUIERDO 5
+#define ECHO_PIN_IZQUIERDO 34
 
-#define TRIG_PIN_2 18
-#define ECHO_PIN_2 39
+#define TRIG_PIN_DERECHO 18
+#define ECHO_PIN_DERECHO 39
 
-#define BUZZER 4
-
-#define MAX_DISTANCIA_SENSOR 60 //(80 cm)
-#define DISTANCIA_OBSTACULO 35  //(30cm)
+// En centimetros
+#define MAX_DISTANCIA_SENSOR 60 
+#define DISTANCIA_OBSTACULO 20  
 
 void sensorTask(void *pvParameters) {
     QueueHandle_t sensorDataQueue = (QueueHandle_t)pvParameters;
 
-    NewPing sensor1(TRIG_PIN_1, ECHO_PIN_1, MAX_DISTANCIA_SENSOR);
-    NewPing sensor2(TRIG_PIN_2, ECHO_PIN_2, MAX_DISTANCIA_SENSOR);
-
-    int sensorValue = 0;
+    NewPing sensorIzquierdo(TRIG_PIN_IZQUIERDO, ECHO_PIN_IZQUIERDO, MAX_DISTANCIA_SENSOR);
+    NewPing sensorDerecho(TRIG_PIN_DERECHO, ECHO_PIN_DERECHO, MAX_DISTANCIA_SENSOR);
 
     bool obstaculoDetectado = false;
 
     for (;;){
-        unsigned int distancia1 = sensor1.ping_cm();
-        unsigned int distancia2 = sensor2.ping_cm();
 
-        if(distancia1 > 5 && distancia1 <= DISTANCIA_OBSTACULO){
-            distancia1 = sensor1.ping_cm();
-        }
+        unsigned int tiempoIzquierda = sensorIzquierdo.ping_median(3);
+        unsigned int tiempoDerecha = sensorDerecho.ping_median(3);
 
-        if(distancia2 > 5 && distancia1 <= DISTANCIA_OBSTACULO){
-            distancia2 = sensor2.ping_cm();
-        }
+        unsigned int distanciaIzquierda = tiempoIzquierda/58;
+        unsigned int distanciaDerecha = tiempoDerecha/58;
         
-        if ((distancia1 > 5 && distancia1 <= DISTANCIA_OBSTACULO) || 
-            (distancia2 > 5 && distancia2 <= DISTANCIA_OBSTACULO)) {
-
-            sensorValue = distancia1;
-            if (xQueueSend(sensorDataQueue, &sensorValue, portMAX_DELAY) != pdPASS) {
-                Serial.println("Failed to send to queue.");
-            }
-
-            if(obstaculoDetectado == false){
+        if ((distanciaIzquierda > 5 && distanciaIzquierda <= DISTANCIA_OBSTACULO) || 
+            (distanciaDerecha > 5 && distanciaDerecha <= DISTANCIA_OBSTACULO)) {
+            if(!obstaculoDetectado){
                 obstaculoDetectado = true;
-                for(int i = 0; i < 3; i++){
-                    digitalWrite(BUZZER, HIGH);
-                    delay(50);
-                    digitalWrite(BUZZER, LOW);
-                    delay(50);
+                if (xQueueSend(sensorDataQueue, &obstaculoDetectado, portMAX_DELAY) != pdPASS) {
+                    Serial.println("Failed to send to queue.");
                 }
             }
+
         }else{
-            obstaculoDetectado = false;
+            if(obstaculoDetectado){
+                obstaculoDetectado = false;
+                if (xQueueSend(sensorDataQueue, &obstaculoDetectado, portMAX_DELAY) != pdPASS) {
+                    Serial.println("Failed to send to queue.");
+                }
+            }
         }
 
         vTaskDelay(50 / portTICK_PERIOD_MS);

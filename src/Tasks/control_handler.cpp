@@ -23,7 +23,7 @@ ControladorWeb controladorWeb;
 RoverControl roverControl(80, &rover, controladorWeb);
 
 void controlTask(void *pvParameters) {
-    QueueHandle_t sensorDataQueue = (QueueHandle_t)pvParameters;
+    QueueHandle_t controlDataQueue = (QueueHandle_t)pvParameters;
 
     wifi.crearRed();
     rover.inicializar();
@@ -31,8 +31,22 @@ void controlTask(void *pvParameters) {
 
     pinMode(BUZZER, OUTPUT);
 
-    int receivedValue = 0;
+    bool controlAutomatico = false;
     for (;;) {
-        roverControl.handleClient();
+        if(xQueueReceive(controlDataQueue, &(controlAutomatico),(TickType_t) 10) == pdPASS ){
+            rover.parar();
+            digitalWrite(BUZZER, HIGH);
+            vTaskDelay(50 / portTICK_PERIOD_MS);
+            digitalWrite(BUZZER, LOW);
+            vTaskDelay(50 / portTICK_PERIOD_MS);
+
+        }
+
+        if(controlAutomatico){
+            rover.retroceder(150);
+            vTaskDelay(10 / portTICK_PERIOD_MS);
+        }else{
+            roverControl.handleClient();
+        }
     }
 }
