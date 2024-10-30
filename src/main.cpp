@@ -22,12 +22,11 @@ QueueHandle_t colaDeSensor;
 void setup() {
     Serial.begin(115200);
 
-    // Cola de 5 numeros enteros
-    colaDeSensor = xQueueCreate(5, sizeof(int));
+    colaDeSensor = xQueueCreate(5, sizeof(bool));
 
     if (colaDeSensor == NULL) {
         Serial.println("Fallo en la creacion de la cola");
-        while (1);  // Parar
+        while (1); 
     }
 
     xTaskCreatePinnedToCore(sensorTask, "Sensor Task", 2048, (void *)colaDeSensor, 1, NULL, 0);
