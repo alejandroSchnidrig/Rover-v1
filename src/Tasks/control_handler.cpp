@@ -33,15 +33,6 @@ void controlTask(void *pvParameters) {
 
     int receivedValue = 0;
     for (;;) {
-        if (xQueueReceive(sensorDataQueue, &receivedValue, portMAX_DELAY) == pdPASS) {
-            rover.parar();
-            vTaskDelay(50 / portTICK_PERIOD_MS);
-            rover.retroceder(150);
-            vTaskDelay(50 / portTICK_PERIOD_MS);
-            rover.parar();
-            vTaskDelay(10 / portTICK_PERIOD_MS);
-        }else{
-            roverControl.handleClient();
-        }
+        roverControl.handleClient();
     }
 }
