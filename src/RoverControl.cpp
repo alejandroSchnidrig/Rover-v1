@@ -13,7 +13,7 @@ void RoverControl::startServer(){
     });
 
     server.on("/RETROCEDER", [this]() {
-        rover->retroceder(255);
+        rover->retroceder(190);
     });
 
     server.on("/GIRO_IZQUIERDA", [this]() {
