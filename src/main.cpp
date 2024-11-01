@@ -30,7 +30,7 @@ void setup() {
     }
 
     xTaskCreatePinnedToCore(sensorTask, "Sensor Task", 2048, (void *)colaDeSensor, 1, NULL, 0);
-    xTaskCreatePinnedToCore(controlTask, "Motor Task", 4096, (void *)colaDeSensor, 1, NULL, 1);
+    xTaskCreatePinnedToCore(controlTask, "Control Task", 4096, (void *)colaDeSensor, 1, NULL, 1);
 }
 
 void loop() {
