@@ -1,15 +1,15 @@
-#ifndef MOTOR_H
-#define MOTOR_H
+#ifndef MOTOR_DRIVER_H
+#define MOTOR_DRIVER_H
 
 #include "Ruedas.h" 
 
-class Motor {
+class MotorDriver {
 private:
     Ruedas ruedasDerecha;
     Ruedas ruedasIzquierda;
 
 public:
-    Motor(int pinDerechaA, int pinDerechaB, int pinDerechaPWM, 
+    MotorDriver(int pinDerechaA, int pinDerechaB, int pinDerechaPWM, 
           int pinIzquierdaA, int pinIzquierdaB, int pinIzquierdaPWM);
 
     void inicializar();

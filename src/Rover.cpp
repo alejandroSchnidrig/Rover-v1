@@ -2,31 +2,31 @@
 
     Rover::Rover(int pinDerechaA, int pinDerechaB, int pinDerechaPWM, 
         int pinIzquierdaA, int pinIzquierdaB, int pinIzquierdaPWM)
-            : motor(pinDerechaA, pinDerechaB, pinDerechaPWM, 
+            : motorDriver(pinDerechaA, pinDerechaB, pinDerechaPWM, 
                 pinIzquierdaA, pinIzquierdaB, pinIzquierdaPWM){}
 
     void Rover::inicializar(){
-         motor.inicializar();
+         motorDriver.inicializar();
     }
 
     void Rover::avanzar(int velocidad){
-        motor.avanzar(velocidad);
+        motorDriver.avanzar(velocidad);
     }
 
     void Rover::retroceder(int velocidad){
-        motor.retroceder(velocidad);
+        motorDriver.retroceder(velocidad);
     }
 
     void Rover::girarALaDerecha(int velocidad){
-        motor.girarALaDerecha(velocidad);
+        motorDriver.girarALaDerecha(velocidad);
     }
 
     void Rover::girarALaIzquierda(int velocidad){
-        motor.girarALaIzquierda(velocidad);
+        motorDriver.girarALaIzquierda(velocidad);
     }
 
     void Rover::parar(){
-        motor.parar();
+        motorDriver.parar();
     }
 
 

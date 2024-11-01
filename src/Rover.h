@@ -1,11 +1,11 @@
 #ifndef ROVER_H
 #define ROVER_H
 
-#include "Motor.h"
+#include "MotorDriver.h"
 
 class Rover {
 private:
-    Motor motor;
+    MotorDriver motorDriver;
 
 public:
     Rover(int pinDerechaA, int pinDerechaB, int pinDerechaPWM, 
