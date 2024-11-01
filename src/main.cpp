@@ -20,6 +20,7 @@
 QueueHandle_t colaDeSensor;
 
 void setup() {
+
     Serial.begin(115200);
 
     colaDeSensor = xQueueCreate(5, sizeof(bool));
