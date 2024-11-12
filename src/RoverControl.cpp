@@ -28,6 +28,10 @@ void RoverControl::startServer(){
         rover->parar();
     });
 
+    server.on("/CORTADORA", [this]() {
+        rover->girarCortadora();
+    });
+
     server.begin();
 }
 

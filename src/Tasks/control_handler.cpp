@@ -11,6 +11,8 @@
 #define IZQUIERDA_A 26
 #define IZQUIERDA_B 27
 #define IZQUIERDA_PWM 25
+#define MEDIO_A 32
+#define MEDIO_B 33
 
 #define BUZZER 4
 
@@ -18,7 +20,7 @@ const char* ssid = "WIFI_ROVER";
 const char* password = "123456789";
 
 ConexionWifi wifi(ssid, password);
-Rover rover(DERECHA_A, DERECHA_B, DERECHA_PWM, IZQUIERDA_A, IZQUIERDA_B, IZQUIERDA_PWM);
+Rover rover(DERECHA_A, DERECHA_B, DERECHA_PWM, IZQUIERDA_A, IZQUIERDA_B, IZQUIERDA_PWM, MEDIO_A, MEDIO_B);
 ControladorWeb controladorWeb;
 RoverControl roverControl(80, &rover, controladorWeb);
 

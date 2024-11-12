@@ -1,9 +1,11 @@
 #include "Rover.h"
 
     Rover::Rover(int pinDerechaA, int pinDerechaB, int pinDerechaPWM, 
-        int pinIzquierdaA, int pinIzquierdaB, int pinIzquierdaPWM)
+        int pinIzquierdaA, int pinIzquierdaB, int pinIzquierdaPWM, 
+        int pinMedioA, int pinMedioB)
             : motorDriver(pinDerechaA, pinDerechaB, pinDerechaPWM, 
-                pinIzquierdaA, pinIzquierdaB, pinIzquierdaPWM){}
+                pinIzquierdaA, pinIzquierdaB, pinIzquierdaPWM),
+              cortadora(pinMedioA, pinMedioB){}
 
     void Rover::inicializar(){
          motorDriver.inicializar();
@@ -27,6 +29,10 @@
 
     void Rover::parar(){
         motorDriver.parar();
+    }
+
+     void Rover::girarCortadora(){
+        cortadora.cortar();
     }
 
 
