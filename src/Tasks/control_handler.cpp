@@ -13,16 +13,22 @@
 #define IZQUIERDA_PWM 25
 #define MEDIO_A 32
 #define MEDIO_B 33
-
 #define BUZZER 4
 
 const char* ssid = "WIFI_ROVER";
 const char* password = "123456789";
 
 ConexionWifi wifi(ssid, password);
-Rover rover(DERECHA_A, DERECHA_B, DERECHA_PWM, IZQUIERDA_A, IZQUIERDA_B, IZQUIERDA_PWM, MEDIO_A, MEDIO_B);
+Rover rover(DERECHA_A, DERECHA_B, DERECHA_PWM, IZQUIERDA_A, IZQUIERDA_B, IZQUIERDA_PWM, MEDIO_A, MEDIO_B, BUZZER);
 ControladorWeb controladorWeb;
 RoverControl roverControl(80, &rover, controladorWeb);
+
+void alarmaSonoraCambioEstado(Rover& rover) {
+    rover.encenderAlarma();
+    vTaskDelay(50 / portTICK_PERIOD_MS);
+    rover.apagarAlarma();
+    vTaskDelay(50 / portTICK_PERIOD_MS);
+}
 
 void controlTask(void *pvParameters) {
     QueueHandle_t controlDataQueue = (QueueHandle_t)pvParameters; //Declaracion de la cola de datos
@@ -30,10 +36,8 @@ void controlTask(void *pvParameters) {
     //Creo la red wifi AP y configuro tanto el Rover como su controlador para ser usados
     wifi.crearRed();
     rover.inicializar();
+    rover.configurarAlarma();
     roverControl.startServer();
-
-    //Configuracion del pin de Buzzer
-    pinMode(BUZZER, OUTPUT);
 
     bool controlAutomatico = false; //Booleano que monitorea el modo de control
     unsigned long tiempoDeInicio; //Monitoreo del tiempo
@@ -49,10 +53,7 @@ void controlTask(void *pvParameters) {
             rover.parar();
 
             //indicacion sonora de un cambio de estado
-            digitalWrite(BUZZER, HIGH);
-            vTaskDelay(50 / portTICK_PERIOD_MS);
-            digitalWrite(BUZZER, LOW);
-            vTaskDelay(50 / portTICK_PERIOD_MS);
+            alarmaSonoraCambioEstado(rover);
 
             //Si se detecta que se cambia a un controlAutomatico, empiezo a monitorear el tiempo
             if(controlAutomatico) tiempoDeInicio = millis();
@@ -66,15 +67,8 @@ void controlTask(void *pvParameters) {
             if((millis() - tiempoDeInicio) > 3000) {
                 //Si estoy en modo automatico por mas de 3 segundos asumo que algo está mal y aborto
                 //El control automatico con una doble señal sonora
-                digitalWrite(BUZZER, HIGH);
-                vTaskDelay(50 / portTICK_PERIOD_MS);
-                digitalWrite(BUZZER, LOW);
-                vTaskDelay(50 / portTICK_PERIOD_MS);
-
-                digitalWrite(BUZZER, HIGH);
-                vTaskDelay(50 / portTICK_PERIOD_MS);
-                digitalWrite(BUZZER, LOW);
-
+                alarmaSonoraCambioEstado(rover);
+                alarmaSonoraCambioEstado(rover);
                 rover.parar();
                 controlAutomatico = false;
             }
@@ -84,3 +78,5 @@ void controlTask(void *pvParameters) {
         }
     }
 }
+
+

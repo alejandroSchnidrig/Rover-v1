@@ -2,10 +2,11 @@
 
     Rover::Rover(int pinDerechaA, int pinDerechaB, int pinDerechaPWM, 
         int pinIzquierdaA, int pinIzquierdaB, int pinIzquierdaPWM, 
-        int pinMedioA, int pinMedioB)
+        int pinMedioA, int pinMedioB, int pinAlarma)
             : motorDriver(pinDerechaA, pinDerechaB, pinDerechaPWM, 
                 pinIzquierdaA, pinIzquierdaB, pinIzquierdaPWM),
-              cortadora(pinMedioA, pinMedioB){}
+              cortadora(pinMedioA, pinMedioB),
+              alarma(pinAlarma){}
 
     void Rover::inicializar(){
          motorDriver.inicializar();
@@ -31,8 +32,18 @@
         motorDriver.parar();
     }
 
-     void Rover::girarCortadora(){
+    void Rover::girarCortadora(){
         cortadora.cortar();
     }
 
+    void Rover::configurarAlarma(){
+        alarma.configurar();
+    }
 
+    void Rover::encenderAlarma(){
+        alarma.encenderAlarma();
+    }
+
+    void Rover::apagarAlarma(){
+        alarma.apagarAlarma();
+    }
