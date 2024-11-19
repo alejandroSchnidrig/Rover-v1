@@ -4,6 +4,7 @@
 #include "./RoverControl.h"
 #include "./ConexionWifi.h"
 #include "./ControladorWeb.h"
+#include "./SensorCorriente.h"
 
 #define DERECHA_A 12
 #define DERECHA_B 14
@@ -13,21 +14,23 @@
 #define IZQUIERDA_PWM 25
 #define MEDIO_A 32
 #define MEDIO_B 33
+#define MEDIO_PWM 23
 #define BUZZER 4
 
 const char* ssid = "WIFI_ROVER";
 const char* password = "123456789";
 
 ConexionWifi wifi(ssid, password);
-Rover rover(DERECHA_A, DERECHA_B, DERECHA_PWM, IZQUIERDA_A, IZQUIERDA_B, IZQUIERDA_PWM, MEDIO_A, MEDIO_B, BUZZER);
+Rover rover(DERECHA_A, DERECHA_B, DERECHA_PWM, IZQUIERDA_A, IZQUIERDA_B, IZQUIERDA_PWM, MEDIO_A, MEDIO_B, MEDIO_PWM, BUZZER);
 ControladorWeb controladorWeb;
 RoverControl roverControl(80, &rover, controladorWeb);
+SensorCorriente sensorCorriente(36);
 
-void alarmaSonoraCambioEstado(Rover& rover) {
+void alarmaSonora(Rover& rover, int delay = 50) {
     rover.encenderAlarma();
-    vTaskDelay(50 / portTICK_PERIOD_MS);
+    vTaskDelay(delay / portTICK_PERIOD_MS);
     rover.apagarAlarma();
-    vTaskDelay(50 / portTICK_PERIOD_MS);
+    vTaskDelay(delay / portTICK_PERIOD_MS);
 }
 
 void controlTask(void *pvParameters) {
@@ -53,7 +56,7 @@ void controlTask(void *pvParameters) {
             rover.parar();
 
             //indicacion sonora de un cambio de estado
-            alarmaSonoraCambioEstado(rover);
+            alarmaSonora(rover);
 
             //Si se detecta que se cambia a un controlAutomatico, empiezo a monitorear el tiempo
             if(controlAutomatico) tiempoDeInicio = millis();
@@ -67,14 +70,24 @@ void controlTask(void *pvParameters) {
             if((millis() - tiempoDeInicio) > 3000) {
                 //Si estoy en modo automatico por mas de 3 segundos asumo que algo está mal y aborto
                 //El control automatico con una doble señal sonora
-                alarmaSonoraCambioEstado(rover);
-                alarmaSonoraCambioEstado(rover);
+                alarmaSonora(rover);
+                alarmaSonora(rover);
                 rover.parar();
                 controlAutomatico = false;
             }
         }else{
             //Si el control es manual entonces manejo las peticiones de la aplicacion web
             roverControl.handleClient();
+
+            float corriente = sensorCorriente.sensarCorriente();
+
+            if(corriente > 3.2){
+                rover.parar();
+                alarmaSonora(rover, 100);
+                alarmaSonora(rover, 100);
+                alarmaSonora(rover, 100);
+                alarmaSonora(rover, 100);
+            }
         }
     }
 }
