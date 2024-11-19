@@ -14,7 +14,7 @@ private:
 public:
     Rover(int pinDerechaA, int pinDerechaB, int pinDerechaPWM, 
           int pinIzquierdaA, int pinIzquierdaB, int pinIzquierdaPWM,
-          int pinMedioA, int pinMedioB, int pinAlarma);
+          int pinMedioA, int pinMedioB, int pinMedioPWM, int pinAlarma);
 
     void inicializar();
     void avanzar(int velocidad);
