@@ -1,9 +1,9 @@
 #include <Arduino.h>
 #include <NewPing.h>
-#include "Sensor.h"
-#include "sensor_task.h"
+#include "./Sensores/Sensor.h"
+#include "SensorTask.h"
 
-// sensor
+// sensor pines
 #define TRIG_PIN_IZQUIERDO 5
 #define ECHO_PIN_IZQUIERDO 34
 
@@ -14,7 +14,9 @@
 #define MAX_DISTANCIA_SENSOR 60
 #define DISTANCIA_OBSTACULO 30
 
-void sensorTask(void *pvParameters) {
+#define TIEMPO_DELAY 40
+
+void SensorTask(void *pvParameters) {
     QueueHandle_t sensorDataQueue = (QueueHandle_t)pvParameters;
 
     Sensor sensorDerecho(TRIG_PIN_DERECHO, ECHO_PIN_DERECHO, MAX_DISTANCIA_SENSOR, DISTANCIA_OBSTACULO);
@@ -36,6 +38,6 @@ void sensorTask(void *pvParameters) {
         }
 
         //delay para no sobrecargar los sensores
-        vTaskDelay(40 / portTICK_PERIOD_MS);
+        vTaskDelay(TIEMPO_DELAY / portTICK_PERIOD_MS);
     }
 }

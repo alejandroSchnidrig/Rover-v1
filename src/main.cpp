@@ -14,8 +14,14 @@
  */
 
 #include <Arduino.h>
-#include "Tasks/control_handler.h"
-#include "Tasks/sensor_task.h"
+#include "Tasks/ControlTask.h"
+#include "Tasks/SensorTask.h"
+
+#define TAMANO_PILA_TAREA_SENSOR 2048
+#define NUCLEO_CPU_TAREA_SENSOR 0
+#define TAMANO_PILA_TAREA_CONTROL 4096
+#define NUCLEO_CPU_TAREA_CONTROL 1
+#define PRIORIDAD_TAREA 1
 
 QueueHandle_t colaDeSensor;
 
@@ -30,8 +36,8 @@ void setup() {
         while (1); 
     }
 
-    xTaskCreatePinnedToCore(sensorTask, "Sensor Task", 2048, (void *)colaDeSensor, 1, NULL, 0);
-    xTaskCreatePinnedToCore(controlTask, "Control Task", 4096, (void *)colaDeSensor, 1, NULL, 1);
+    xTaskCreatePinnedToCore(SensorTask, "Sensor Task", TAMANO_PILA_TAREA_SENSOR, (void *)colaDeSensor, PRIORIDAD_TAREA, NULL, NUCLEO_CPU_TAREA_SENSOR);
+    xTaskCreatePinnedToCore(ControlTask, "Control Task", TAMANO_PILA_TAREA_CONTROL, (void *)colaDeSensor, PRIORIDAD_TAREA, NULL, NUCLEO_CPU_TAREA_CONTROL);
 }
 
 void loop() {
