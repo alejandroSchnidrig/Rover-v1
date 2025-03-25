@@ -1,8 +1,9 @@
 # Rover
 [DOCUMENTACION](https://docs.google.com/document/d/1z0UEyLg1B15ekQGM2um6Bg24HL6CUMYjTqEKnlLb4_M/edit?usp=sharing)
 
-![ROVER EN MOVIMIENTO](https://imgur.com/a/42Zpjvj)
-![IMAGEN ROVER](https://imgur.com/a/D258Vb0)
+
+![ROVER EN MOVIMIENTO](https://i.imgur.com/Dlmft7P.mp4)
+![IMAGEN ROVER](https://i.imgur.com/3mO8SVD.jpeg)
 # Contexto
 Un Rover es un vehículo versátil diseñado para explorar y operar en terrenos difíciles donde
 los vehículos convencionales no pueden acceder. En la vida cotidiana, se utiliza en tareas
